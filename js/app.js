@@ -1,12 +1,26 @@
 var token;
 
+var Video = function(value) {
+  this.thumbnailimage = value.snippet.thumbnails.medium.url;
+  this.largethumbnailimage = value.snippet.thumbnails.high.url;
+  this.channellink = 'https://www.youtube.com/channel/' + value.snippet.channelId;
+  this.channelname = value.snippet.channelTitle;
+  this.link = 'https://www.youtube.com/watch?v=' +  value.id.videoId;
+  this.title = value.snippet.title;
+};
+
+Video.prototype.makehtml = function() {
+  this.html = '<li><a target="_new" href="'+ this.link +'"><h1>'+ this.title +'</h1></a><a target="_new" href="' + this.channellink + '"><h2>' + this.channelname + '</h2></a><a  data-lightbox="' + this.largethumbnailimage + '" href="' + this.largethumbnailimage + '"><img src="' + this.thumbnailimage + '"></a></li>';
+  return this.html;
+};
+
 $(function() {
     $('#search-term').submit(function(event) {
         event.preventDefault();
         var searchTerm = $('#query').val();
         $('#search-results').empty();
         getRequest(searchTerm);
-        
+
     });
 
     $('#nextpage').click(function () {
@@ -38,12 +52,27 @@ function getRequest(searchTerm, tokenInput) {
 function showResults(results) {
     var html = "";
     $.each(results, function(index, value) {
-        var thumbnailimage = value.snippet.thumbnails.medium.url;
-        var largethumbnailimage = value.snippet.thumbnails.high.url;
-        var channellink = 'https://www.youtube.com/channel/' + value.snippet.channelId;
-        var channelname = value.snippet.channelTitle;
-        var link = 'https://www.youtube.com/watch?v=' +  value.id.videoId;
-        html += '<li><a target="_new" href="'+link+'"><h1>'+ value.snippet.title +'</h1></a><a target="_new" href="' + channellink + '"><h2>' + channelname + '</h2></a><a  data-lightbox="' + largethumbnailimage + '" href="' + largethumbnailimage + '"><img src="' + thumbnailimage + '"></a></li>';
+        var itemvideo = new Video(value);
+        html += itemvideo.makehtml();
     });
     $('#search-results').append(html);
 }
+var token;
+
+$(function() {
+    $('#search-term').submit(function(event) {
+        event.preventDefault();
+        var searchTerm = $('#query').val();
+        $('#search-results').empty();
+        getRequest(searchTerm);
+
+    });
+
+    $('#nextpage').click(function () {
+        var searchTerm = $('#query').val();
+
+        getRequest(searchTerm, token);
+
+    });
+
+});
